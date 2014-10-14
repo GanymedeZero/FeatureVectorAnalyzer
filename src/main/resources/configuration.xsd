@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.audioanalyser.rankminer.com/config" xmlns:tns="http://www.audioanalyser.rankminer.com/config" elementFormDefault="qualified">
+
+    <element name="config" type="tns:config"></element>
+    
+    <complexType name="config">
+    	<sequence>
+    		<element name="clientList" type="tns:client" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="client">
+    	<sequence>
+    		<element name="name" type="string" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="dataInputDirectory" type="string"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="dataOutputDirectory" type="string" maxOccurs="1" minOccurs="1"></element>
+    		<element name="dataArchiveDirectory" type="string"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="dataErrorArchiveDirectory" type="string"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="pollingInterval" type="long" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    	</sequence>
+    </complexType>
+</schema>
