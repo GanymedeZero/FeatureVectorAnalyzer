@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.featurevectoranalyzer.rankminer.com/configuration">
+	<delimiter>\|</delimiter>
+    <ftp>
+        <sourceFolder>/opt/rankminer/files</sourceFolder>
+        <destinationFolder>/opt/rankminer/to_process</destinationFolder>
+        <userName>admin</userName>
+        <password>admin</password>
+        <hostName>10.01.22.22</hostName>
+    </ftp>
+    <dbConfiguration>
+        <userName>rankminer</userName>
+        <password>rankminer</password>
+        <hostName>Hazel.arvixe.com</hostName>
+        <dbName>rpm_db</dbName>
+    </dbConfiguration>
+</configuration>
