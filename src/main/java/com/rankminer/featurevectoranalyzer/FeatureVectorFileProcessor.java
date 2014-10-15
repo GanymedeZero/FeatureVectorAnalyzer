@@ -31,13 +31,7 @@ public class FeatureVectorFileProcessor {
 			String data;
 			List<String[]> queryList = new ArrayList<String[]>();
 			while (( data = reader.readLine()) != null) {
-	              int status = 0;
 	              String[] rec = data.split(configuration.getDelimiter());
-	              /*StringBuilder rejoinedrec = new StringBuilder(1024);
-	              for (int j = 0; j < rec.length; j++) {
-	                  rec[j] = "'" + rec[j] + "'" + ",";
-	                  rejoinedrec.append(rec[j]);
-	              }  */            
 	              queryList.add(rec);
 	        }
 			

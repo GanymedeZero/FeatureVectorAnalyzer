@@ -33,6 +33,7 @@ public class MetaDataDao {
 	
 	
 	public void writeBatch(List<String[]> queryList) {
+		int count = 0;
 		try {
 			Class.forName(driver).newInstance();
 			Connection conn = null;
@@ -42,28 +43,31 @@ public class MetaDataDao {
 	        preparedStatement  = conn.prepareStatement("Insert into metadata (office_no,file_num,appl,filler2,rec_status,"
 	        		+ "call_date, TSR,rec_duration,f_path,sample_rate,order_num,rec_addi_status,"
 	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-	        int count = 0;
+	        
 	        for(String[] queryParameter : queryList) {
-	        	if(count > 10) break;
-	        	count++;
-	        	preparedStatement.setString(1,queryParameter[0]);
-	        	preparedStatement.setString(2,queryParameter[1]);
-	        	preparedStatement.setString(3,queryParameter[2]);
-	        	preparedStatement.setString(4,queryParameter[3]);
-	        	preparedStatement.setString(5,queryParameter[4]);
-				preparedStatement.setDate(6, java.sql.Date.valueOf(convertToDate(queryParameter[5])));
-				preparedStatement.setString(7, queryParameter[6]);
-				preparedStatement.setInt(8, Integer.parseInt(queryParameter[7]));
-				preparedStatement.setString(9, queryParameter[8]);
-				preparedStatement.setString(10, queryParameter[9]);
-				preparedStatement.setString(11, queryParameter[10]);
-				preparedStatement.setString(12, queryParameter[11]);
-				preparedStatement.setString(13, queryParameter[12]);
-				preparedStatement.setTime(14, java.sql.Time.valueOf(queryParameter[13]));
-				preparedStatement.setTime(15, java.sql.Time.valueOf(queryParameter[14]));
-				preparedStatement.setString(16, queryParameter[15]);
-				preparedStatement.setString(17, queryParameter[16]);
-	        	preparedStatement.addBatch();	
+	        	try {
+	        		count ++;
+		        	preparedStatement.setString(1,queryParameter[0]);
+		        	preparedStatement.setString(2,queryParameter[1]);
+		        	preparedStatement.setString(3,queryParameter[2]);
+		        	preparedStatement.setString(4,queryParameter[3]);
+		        	preparedStatement.setString(5,queryParameter[4]);
+					preparedStatement.setDate(6, java.sql.Date.valueOf(convertToDate(queryParameter[5])));
+					preparedStatement.setString(7, queryParameter[6]);
+					preparedStatement.setInt(8, Integer.parseInt(queryParameter[7]));
+					preparedStatement.setString(9, queryParameter[8]);
+					preparedStatement.setString(10, queryParameter[9]);
+					preparedStatement.setString(11, queryParameter[10]);
+					preparedStatement.setString(12, queryParameter[11]);
+					preparedStatement.setString(13, queryParameter[12]);
+					preparedStatement.setTimestamp(14, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+queryParameter[13]));
+					preparedStatement.setTimestamp(15, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+ queryParameter[14]));
+					preparedStatement.setString(16, queryParameter[15]);
+					preparedStatement.setString(17, queryParameter[16]);
+		        	preparedStatement.addBatch();	
+	        	}catch(Exception e) {
+	        		LOGGER.error("Problem writing record "+  count +"to the database. Dropping record"+ e.getMessage());		
+	        	}	        		
 	        }
 	        int [] updateCounts = preparedStatement.executeBatch();
 	        LOGGER.info("Committed " + updateCounts.length + " objects");
@@ -71,8 +75,8 @@ public class MetaDataDao {
             preparedStatement.close();
             conn.close();
             
-		} catch (Exception e) {
-			LOGGER.error("Problem writing to the database "+ e.getMessage());
+		} catch (Exception e) {			
+			LOGGER.error("Problem writing record "+  count +"to the database "+ e.getMessage());
 		}
 	}
 	
