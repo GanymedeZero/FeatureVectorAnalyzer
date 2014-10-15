@@ -29,7 +29,7 @@ public class FeatureVectorFileProcessor {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(fileName));
 			String data;
-			List<String[]> queryList = new ArrayList<String>();
+			List<String[]> queryList = new ArrayList<String[]>();
 			while (( data = reader.readLine()) != null) {
 	              int status = 0;
 	              String[] rec = data.split(configuration.getDelimiter());

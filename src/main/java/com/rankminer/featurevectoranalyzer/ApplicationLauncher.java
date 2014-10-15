@@ -11,8 +11,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.log4j.Logger;
 
-import scala.annotation.cloneable;
-
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
 import com.rankminer.featurevectoranalyzer.configuration.Ftp;

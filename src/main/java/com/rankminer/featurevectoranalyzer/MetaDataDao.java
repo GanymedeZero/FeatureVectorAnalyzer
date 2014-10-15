@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,25 +36,39 @@ public class MetaDataDao {
 		try {
 			Class.forName(driver).newInstance();
 			Connection conn = null;
-	        PreparedStatement st = null;
+	        PreparedStatement preparedStatement = null;
 	        conn = DriverManager.getConnection(String.format(url, dbConfig.getHostName()) + dbConfig.getDbName(), dbConfig.getUserName(), dbConfig.getPassword());
 	        conn.setAutoCommit(false);
-	        st  = conn.prepareStatement("Insert into metadata values (office_no,file_num,appl,filler2,rec_status,"
+	        preparedStatement  = conn.prepareStatement("Insert into metadata (office_no,file_num,appl,filler2,rec_status,"
 	        		+ "call_date, TSR,rec_duration,f_path,sample_rate,order_num,rec_addi_status,"
-	        		+ "listid,start_time,end_time,station,device_name) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	        int count = 0;
 	        for(String[] queryParameter : queryList) {
 	        	if(count > 10) break;
 	        	count++;
-	        	for(String s : queryParameter) {
-	        		st.setString(2,s);	
-	        	}
-	        		
+	        	preparedStatement.setString(1,queryParameter[0]);
+	        	preparedStatement.setString(2,queryParameter[1]);
+	        	preparedStatement.setString(3,queryParameter[2]);
+	        	preparedStatement.setString(4,queryParameter[3]);
+	        	preparedStatement.setString(5,queryParameter[4]);
+				preparedStatement.setDate(6, java.sql.Date.valueOf(convertToDate(queryParameter[5])));
+				preparedStatement.setString(7, queryParameter[6]);
+				preparedStatement.setInt(8, Integer.parseInt(queryParameter[7]));
+				preparedStatement.setString(9, queryParameter[8]);
+				preparedStatement.setString(10, queryParameter[9]);
+				preparedStatement.setString(11, queryParameter[10]);
+				preparedStatement.setString(12, queryParameter[11]);
+				preparedStatement.setString(13, queryParameter[12]);
+				preparedStatement.setTime(14, java.sql.Time.valueOf(queryParameter[13]));
+				preparedStatement.setTime(15, java.sql.Time.valueOf(queryParameter[14]));
+				preparedStatement.setString(16, queryParameter[15]);
+				preparedStatement.setString(17, queryParameter[16]);
+	        	preparedStatement.addBatch();	
 	        }
-	        int [] updateCounts = st.executeBatch();
+	        int [] updateCounts = preparedStatement.executeBatch();
 	        LOGGER.info("Committed " + updateCounts.length + " objects");
             conn.commit();
-            st.close();
+            preparedStatement.close();
             conn.close();
             
 		} catch (Exception e) {
@@ -61,4 +76,11 @@ public class MetaDataDao {
 		}
 	}
 	
-}
+	
+	public static String convertToDate(String date) {
+		StringBuilder sb = new StringBuilder();
+		String tokens[] = date.split("/");
+		sb.append(tokens[2] + "-" + tokens[0] + "-" + tokens[1]);
+		return sb.toString();
+	}
+} 
