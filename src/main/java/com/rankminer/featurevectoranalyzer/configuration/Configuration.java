@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "configuration", propOrder = {
 	"delimiter",
-    "ftp",
+    "scpConfig",
     "dbConfiguration"
 })
 @XmlRootElement
@@ -47,7 +47,7 @@ public class Configuration {
 	@XmlElement(required=true)
 	protected String delimiter;
 	@XmlElement(required = true)
-    protected Ftp ftp;
+    protected SCPConfig scpConfig;
     @XmlElement(required = true)
     protected DbConfiguration dbConfiguration;
 
@@ -59,8 +59,8 @@ public class Configuration {
      *     {@link Ftp }
      *     
      */
-    public Ftp getFtp() {
-        return ftp;
+    public SCPConfig getSCPConfig() {
+        return scpConfig;
     }
 
     /**
@@ -71,8 +71,8 @@ public class Configuration {
      *     {@link Ftp }
      *     
      */
-    public void setFtp(Ftp value) {
-        this.ftp = value;
+    public void setSCPConfig(SCPConfig value) {
+        this.scpConfig = value;
     }
 
     /**

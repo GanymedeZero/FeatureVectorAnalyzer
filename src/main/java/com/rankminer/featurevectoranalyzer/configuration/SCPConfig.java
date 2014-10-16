@@ -38,17 +38,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ftp", propOrder = {
-    "sourceFolder",
+@XmlType(name = "scpConfig", propOrder = {
     "destinationFolder",
     "userName",
     "password",
     "hostName"
 })
-public class Ftp {
+public class SCPConfig {
 
-    @XmlElement(required = true)
-    protected String sourceFolder;
     @XmlElement(required = true)
     protected String destinationFolder;
     @XmlElement(required = true)
@@ -57,30 +54,6 @@ public class Ftp {
     protected String password;
     @XmlElement(required = true)
     protected String hostName;
-
-    /**
-     * Gets the value of the sourceFolder property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSourceFolder() {
-        return sourceFolder;
-    }
-
-    /**
-     * Sets the value of the sourceFolder property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSourceFolder(String value) {
-        this.sourceFolder = value;
-    }
 
     /**
      * Gets the value of the destinationFolder property.

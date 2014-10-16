@@ -3,10 +3,10 @@ package com.rankminer.featurevectoranalyzer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.List;
+
+import net.schmizz.sshj.SSHClient;
 
 import org.apache.log4j.Logger;
 
@@ -43,10 +43,11 @@ public class MetaDataDao {
 	        preparedStatement  = conn.prepareStatement("Insert into metadata (office_no,file_num,appl,filler2,rec_status,"
 	        		+ "call_date, TSR,rec_duration,f_path,sample_rate,order_num,rec_addi_status,"
 	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        long startTime = System.currentTimeMillis();
 	        
 	        for(String[] queryParameter : queryList) {
 	        	try {
-	        		count ++;
+	        		
 		        	preparedStatement.setString(1,queryParameter[0]);
 		        	preparedStatement.setString(2,queryParameter[1]);
 		        	preparedStatement.setString(3,queryParameter[2]);
@@ -64,22 +65,32 @@ public class MetaDataDao {
 					preparedStatement.setTimestamp(15, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+ queryParameter[14]));
 					preparedStatement.setString(16, queryParameter[15]);
 					preparedStatement.setString(17, queryParameter[16]);
-		        	preparedStatement.addBatch();	
+		        	preparedStatement.addBatch();
+		        	if(count %1000 == 0) {
+	        			count = 0;
+	        			commitRecords(preparedStatement, conn);
+	        		}
+		        	count++;
 	        	}catch(Exception e) {
-	        		LOGGER.error("Problem writing record "+  count +"to the database. Dropping record"+ e.getMessage());		
+	        		LOGGER.error("Dropping record no."+ count +" due to "+ e.getMessage());		
 	        	}	        		
 	        }
-	        int [] updateCounts = preparedStatement.executeBatch();
-	        LOGGER.info("Committed " + updateCounts.length + " objects");
-            conn.commit();
+	        
             preparedStatement.close();
             conn.close();
-            
+            LOGGER.info("Time taken to batch update " +count + " records " + (System.currentTimeMillis() - startTime));
 		} catch (Exception e) {			
 			LOGGER.error("Problem writing record "+  count +"to the database "+ e.getMessage());
 		}
 	}
 	
+	public void commitRecords(PreparedStatement statement, Connection connection) throws SQLException {
+		int [] updateCounts = statement.executeBatch();
+		connection.commit();
+		connection.setAutoCommit(false);
+		statement.clearBatch();
+        LOGGER.info("Committed " + updateCounts.length + " objects");
+	}
 	
 	public static String convertToDate(String date) {
 		StringBuilder sb = new StringBuilder();

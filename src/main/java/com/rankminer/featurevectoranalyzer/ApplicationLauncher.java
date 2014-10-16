@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
-import com.rankminer.featurevectoranalyzer.configuration.Ftp;
+import com.rankminer.featurevectoranalyzer.configuration.SCPConfig;
 
 
 /**
@@ -33,13 +33,12 @@ public final class ApplicationLauncher {
 	public static void writeConfiguration() throws JAXBException {
 		File file = new File("configuration.xml");
 		Configuration config = new Configuration();
-		Ftp ftp = new Ftp();
-		ftp.setSourceFolder("/opt/rankminer/files");
+		SCPConfig ftp = new SCPConfig();
 		ftp.setDestinationFolder("/opt/rankminer/to_process");
 		ftp.setHostName("10.01.22.22");
 		ftp.setPassword("admin");
 		ftp.setUserName("admin");
-		config.setFtp(ftp);
+		config.setSCPConfig(ftp);
 		
 		DbConfiguration dbConfig = new DbConfiguration();
 		dbConfig.setDbName("rankminer");
@@ -70,6 +69,7 @@ public final class ApplicationLauncher {
 		Configuration config = (Configuration)jaxbMarshaller.unmarshal(file);
 		return config;
 	}
+	
 	
 	
 	/**
