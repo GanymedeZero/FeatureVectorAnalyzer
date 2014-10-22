@@ -9,7 +9,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.log4j.Logger;
+import jline.console.ConsoleReader;
+import jline.console.completer.StringsCompleter;
 
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
@@ -27,9 +28,8 @@ public final class ApplicationLauncher {
 
 	private Configuration configuration;
 	
-	private static final Logger LOGGER = Logger
-			.getLogger(ApplicationLauncher.class);
-
+	private static final String[] commands = {"extract", "scp-copy", "export-features"};
+	
 	public static void writeConfiguration() throws JAXBException {
 		File file = new File("configuration.xml");
 		Configuration config = new Configuration();
@@ -81,11 +81,15 @@ public final class ApplicationLauncher {
 	public static void main(final String args[]) {
 		ApplicationLauncher l = new ApplicationLauncher();
 		try {
+			ConsoleReader console = new ConsoleReader(System.in, System.out);
+            console.setPrompt("prompt> ");
+            console.addCompleter(new StringsCompleter(commands));
+            console.setBellEnabled(false);
 			l.setConfiguration(l.readConfigurationFile(args[0]));
 			FeatureVectorFileProcessor processor =  new FeatureVectorFileProcessor(l.getConfiguration());
 			processor.processFile(args[1]);
 		} catch (Exception e) {
-			LOGGER.error("Unable to read configuration. Exiting program");
+			System.out.println("Unable to read configuration. Exiting program");
 			System.exit(0);
 		}		
 	}

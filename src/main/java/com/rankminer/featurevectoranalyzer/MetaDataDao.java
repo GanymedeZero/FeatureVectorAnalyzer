@@ -6,10 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import net.schmizz.sshj.SSHClient;
-
-import org.apache.log4j.Logger;
-
 import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
 
 /**
@@ -18,9 +14,6 @@ import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
  *
  */
 public class MetaDataDao {
-	private static final Logger LOGGER = Logger
-			.getLogger(MetaDataDao.class);
-
 	private static final String driver = "com.mysql.jdbc.Driver";
 
 	private static final String url = "jdbc:mysql://%s:3306/";
@@ -47,7 +40,6 @@ public class MetaDataDao {
 	        
 	        for(String[] queryParameter : queryList) {
 	        	try {
-	        		
 		        	preparedStatement.setString(1,queryParameter[0]);
 		        	preparedStatement.setString(2,queryParameter[1]);
 		        	preparedStatement.setString(3,queryParameter[2]);
@@ -72,15 +64,15 @@ public class MetaDataDao {
 	        		}
 		        	count++;
 	        	}catch(Exception e) {
-	        		LOGGER.error("Dropping record no."+ count +" due to "+ e.getMessage());		
+	        		System.out.println("Dropping record no."+ count +" due to "+ e.getMessage());		
 	        	}	        		
 	        }
-	        
+	        commitRecords(preparedStatement, conn);
             preparedStatement.close();
             conn.close();
-            LOGGER.info("Time taken to batch update " +count + " records " + (System.currentTimeMillis() - startTime));
+            System.out.println("Time taken to batch update " +count + " records " + (System.currentTimeMillis() - startTime));
 		} catch (Exception e) {			
-			LOGGER.error("Problem writing record "+  count +"to the database "+ e.getMessage());
+			System.out.println("Problem writing record "+  count +"to the database "+ e.getMessage());
 		}
 	}
 	
@@ -89,7 +81,7 @@ public class MetaDataDao {
 		connection.commit();
 		connection.setAutoCommit(false);
 		statement.clearBatch();
-        LOGGER.info("Committed " + updateCounts.length + " objects");
+		System.out.println("Committed " + updateCounts.length + " objects");
 	}
 	
 	public static String convertToDate(String date) {

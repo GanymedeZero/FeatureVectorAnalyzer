@@ -24,13 +24,11 @@ public class SCPHandler {
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(InetAddress.getByName(config.getHostName()));
 		client.authPassword(config.getUserName(), config.getPassword());
-		
 		SCPFileTransfer transfer =  client.newSCPFileTransfer();
 		for(String filePath : filePaths) {
+			System.out.println("Copying file "+ filePath + " to destination "+ config.getDestinationFolder());
 			transfer.download(filePath, config.getDestinationFolder());	
 		}
-		
-		
 		client.disconnect();
 	}
 }
