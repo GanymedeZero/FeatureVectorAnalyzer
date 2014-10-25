@@ -13,4 +13,13 @@
         <hostName>Hazel.arvixe.com</hostName>
         <dbName>rpm_db</dbName>
     </dbConfiguration>
+    <metadataConfig>
+    	<processStatusCodeList>
+    		<processStatusCode>1</processStatusCode>
+    		<processStatusCode>2</processStatusCode>
+    	</processStatusCodeList>
+    	<scpSuccessCode>1</scpSuccessCode>
+    	<scpFailureCode>2</scpFailureCode>
+    </metadataConfig>
 </configuration>
+

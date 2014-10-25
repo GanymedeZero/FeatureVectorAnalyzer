@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+         <!-- XML Schema Generated from XML Document on Sat Oct 25 2014 18:29:59 GMT-0400 (Eastern Daylight Time) -->
+         <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+         <xs:element name="resources">
+               <xs:complexType>
+                     <xs:sequence>
+                           <xs:element name="resource" maxOccurs="unbounded">
+                                 <xs:complexType>
+                                       <xs:sequence>
+                                             <xs:element name="fileName" type="xs:string"></xs:element>
+                                             <xs:element name="features" maxOccurs="unbounded" type="xs:double"></xs:element>
+                                       </xs:sequence>
+                                       <xs:attribute name="fileId" type="xs:int"></xs:attribute>
+                                 </xs:complexType>
+                           </xs:element>
+                     </xs:sequence>
+               </xs:complexType>
+         </xs:element>
+ </xs:schema>

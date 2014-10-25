@@ -50,7 +50,9 @@ public class Configuration {
     protected SCPConfig scpConfig;
     @XmlElement(required = true)
     protected DbConfiguration dbConfiguration;
-
+    @XmlElement(required = true)
+    protected MetaDataConfig metadataConfig;
+    
     /**
      * Gets the value of the ftp property.
      * 
@@ -106,5 +108,30 @@ public class Configuration {
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
 	}
+	
+	/**
+     * Gets the value of the metadataConfig property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link MetadataConfig }
+     *     
+     */
+    public MetaDataConfig getMetadataConfig() {
+        return metadataConfig;
+    }
+
+    /**
+     * Sets the value of the metadataConfig property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link MetadataConfig }
+     *     
+     */
+    public void setMetaDataConfig(MetaDataConfig value) {
+        this.metadataConfig = value;
+    }
+
 
 }
