@@ -9,12 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.StatementEvent;
-
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
-import com.rankminer.featurevectoranalyzer.configuration.DbConfiguration;
 import com.rankminer.featurevectoranalyzer.model.MetaDataModel;
-import com.rankminer.featurevectoranalyzer.model.MetaDataModel.MetaDataModelBuilder;
 
 /**
  * DAO class to write to metadata table in the rpm db.
@@ -32,6 +28,7 @@ public class MetaDataDao {
 		this.configuration = config;
 	}
 	
+	
 	/**
 	 * Query the metadata table and retrive all MetaDataModel which has rec_status='1' or '2' and whose
 	 * rec_addi_status is either empty or null.
@@ -45,9 +42,9 @@ public class MetaDataDao {
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
 	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in(?,?) and"
-	        		+ "rec_addi_status IS NULL or rec_addi_status=''");
+	        		+ " rank_miner_status IS NULL");
 	        preparedStatement.setString(1, configuration.getMetadataConfig().getProcessStatusCode().get(0));
-	        preparedStatement.setString(1, configuration.getMetadataConfig().getProcessStatusCode().get(1));
+	        preparedStatement.setString(2, configuration.getMetadataConfig().getProcessStatusCode().get(1));
 	        ResultSet rs = preparedStatement.executeQuery();	        
 	        while (rs.next()) {
 	        	MetaDataModel model = new MetaDataModel.MetaDataModelBuilder().setFilePath(rs.getString("f_path")).
@@ -60,28 +57,10 @@ public class MetaDataDao {
 	        }
 		}  catch (Exception e) {
 			System.out.println("Problem reading MetaData record by rec_status");
-		}
+		};
 		return modelList;
 	}
-	
-	public void updateProcessedMetaDataRecord() {
-		//
-		try {
-			Class.forName(driver).newInstance();
-			Connection conn = null;
-	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
-	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
-	        Statement statement = conn.createStatement();
-	        int records = statement.executeUpdate("UPDATE metadata SET rec_addi_status = 1 WHERE rec_status in ('1','2')");
-	       // System.out.println("Update ")
-	        
-		}catch(Exception e) {
-			
-		}
 
-		
-	}
-	
 	/**
 	 * Update the rec_addi_status field of the metadata table whose mdId is passed into the function.
 	 * @param statusCode
@@ -96,7 +75,7 @@ public class MetaDataDao {
 	        
 	        
 	        
-	        StringBuilder sql = new StringBuilder("Update metadata set rec_addi_status = ? where md_id in (" );
+	        StringBuilder sql = new StringBuilder("Update metadata set rank_miner_status = ? where md_id in (" );
 	        conn.setAutoCommit(false);
 	        for( String id : mdIdList) {
 	        	sql.append("?,");	        		
@@ -104,18 +83,18 @@ public class MetaDataDao {
 	        
 	        sql = sql.deleteCharAt( sql.length() -1 );
 	        sql.append(")");
+	        System.out.println("SQL query : " + sql.toString());
 	        PreparedStatement statement = conn.prepareStatement(sql.toString());
 	        statement.setString(1, statusCode);
 	        int parameterIndex =2;
 	        for( String id : mdIdList) {
-	        	statement.setString(parameterIndex++, id);        		
+	        	statement.setInt(parameterIndex++, Integer.parseInt(id));        		
 	        }	        
 	        int updateCount = statement.executeUpdate();
 	        conn.commit();
 	        statement.close();
             conn.close();
 	        System.out.println(" "+ updateCount + " rows updated in metadata table");
-	        
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -149,7 +128,7 @@ public class MetaDataDao {
 					preparedStatement.setString(9, queryParameter[8]);
 					preparedStatement.setString(10, queryParameter[9]);
 					preparedStatement.setString(11, queryParameter[10]);
-					preparedStatement.setString(12, queryParameter[11].trim().length() >= 1 ? queryParameter[11].trim() : null);
+					preparedStatement.setString(12, queryParameter[11]);
 					preparedStatement.setString(13, queryParameter[12]);
 					preparedStatement.setTimestamp(14, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+queryParameter[13]));
 					preparedStatement.setTimestamp(15, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+ queryParameter[14]));

@@ -2,11 +2,8 @@ package com.rankminer.featurevectoranalyzer;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -28,6 +25,7 @@ public class FeatureVectorConverter {
 	 * @param destinationFileName
 	 */
 	public void convertFeatureVectorXmlToCsv(String sourceFileName, String destinationFileName) {
+		System.out.println("Reading feature vector file "+ sourceFileName);
 		File file = new File(sourceFileName);
 		JAXBContext jaxbContext;
 		try {

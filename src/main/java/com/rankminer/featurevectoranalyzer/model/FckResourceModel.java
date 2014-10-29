@@ -7,16 +7,14 @@ package com.rankminer.featurevectoranalyzer.model;
  *
  */
 public class FckResourceModel {
-	private int fileId;
+	private long fileId;
 	private String fileStatus;
 	private String metaDataStatus;
 	
-	public int getFileId() {
+	public long getFileId() {
 		return fileId;
 	}
-	public void setFileId(int fileId) {
-		this.fileId = fileId;
-	}
+	
 	public String getFileStatus() {
 		return fileStatus;
 	}
@@ -28,5 +26,8 @@ public class FckResourceModel {
 	}
 	public void setMetaDataStatus(String metaDataStatus) {
 		this.metaDataStatus = metaDataStatus;
+	}
+	public void setFileId(long value) {
+		this.fileId = value;
 	}
 }

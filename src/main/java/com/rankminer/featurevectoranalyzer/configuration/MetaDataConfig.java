@@ -11,13 +11,13 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "metadataConfig", propOrder = {
-    "processStatusCodeList",
+    "processStatusCode",
 	"scpSuccessCode",
 	"scpFailureCode"
 })
 public class MetaDataConfig {
 	@XmlElementWrapper(name="processStatusCodeList")
-	@XmlElement(required = true, name="processStatusCode")
+	@XmlElement(required = true)
 	protected List<String> processStatusCode;
 	
 	@XmlElement(required = true, name="scpSuccessCode")

@@ -39,7 +39,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "configuration", propOrder = {
 	"delimiter",
     "scpConfig",
-    "dbConfiguration"
+    "dbConfiguration",
+    "metadataConfig"
 })
 @XmlRootElement
 public class Configuration {
