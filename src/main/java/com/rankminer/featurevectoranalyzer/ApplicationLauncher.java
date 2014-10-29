@@ -129,8 +129,15 @@ public final class ApplicationLauncher {
 	 */
 	private static void translateFVXmlToCsv(String command) {
 		// TODO Auto-generated method stub
-		FeatureVectorConverter converter = new FeatureVectorConverter();
-		converter.convertFeatureVectorXmlToCsv(command.split(" ")[1], command.split(" ")[2]);	
+		FeatureVectorConverter converter;
+		try {
+			converter = new FeatureVectorConverter(readConfigurationFile("configuration.xml"));
+			converter.convertFeatureVectorXmlToCsv(command.split(" ")[1], command.split(" ")[2]);
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
 	}
 
 

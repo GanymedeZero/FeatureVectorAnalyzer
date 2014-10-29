@@ -5,10 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.model.MetaDataModel;
 
@@ -45,7 +44,7 @@ public class MetaDataDao {
 	        		+ " rank_miner_status IS NULL");
 	        preparedStatement.setString(1, configuration.getMetadataConfig().getProcessStatusCode().get(0));
 	        preparedStatement.setString(2, configuration.getMetadataConfig().getProcessStatusCode().get(1));
-	        ResultSet rs = preparedStatement.executeQuery();	        
+	        ResultSet rs = preparedStatement.executeQuery();
 	        while (rs.next()) {
 	        	MetaDataModel model = new MetaDataModel.MetaDataModelBuilder().setFilePath(rs.getString("f_path")).
 	        			setOfficeNo(rs.getString("office_no")).
@@ -100,7 +99,10 @@ public class MetaDataDao {
 		}
 	}
 	
-	
+	/**
+	 * Write data from the metadata csv into the metadata table.
+	 * @param queryList
+	 */
 	public void writeBatch(List<String[]> queryList) {
 		int count = 0;
 		try {
@@ -112,7 +114,7 @@ public class MetaDataDao {
 	        conn.setAutoCommit(false);
 	        preparedStatement  = conn.prepareStatement("Insert into metadata (office_no,file_num,appl,filler2,rec_status,"
 	        		+ "call_date, TSR,rec_duration,f_path,sample_rate,order_num,rec_addi_status,"
-	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	        long startTime = System.currentTimeMillis();
 	        int totalCount = 0;
 	        for(String[] queryParameter : queryList) {
@@ -134,6 +136,11 @@ public class MetaDataDao {
 					preparedStatement.setTimestamp(15, java.sql.Timestamp.valueOf(convertToDate(queryParameter[5]) + " "+ queryParameter[14]));
 					preparedStatement.setString(16, queryParameter[15]);
 					preparedStatement.setString(17, queryParameter[16]);
+					// Prepare file name by using office_no+file_num+appl+".vox"
+					if(queryParameter[0] != null && queryParameter[1] != null && queryParameter[3] != null) {
+						preparedStatement.setString(18,queryParameter[0]+queryParameter[1]+queryParameter[3]+".vox");	
+					}
+					
 		        	preparedStatement.addBatch();
 		        	if(count %1000 == 0) {
 	        			count = 0;
@@ -168,6 +175,39 @@ public class MetaDataDao {
 		sb.append(tokens[2] + "-" + tokens[0] + "-" + tokens[1]);
 		return sb.toString();
 	}
-	
-	
+
+	/**
+	 * Writing the first five feature vector to the database.
+	 * @param featureVectorByFile
+	 */
+	public void writeFeatureVector(Map<String, List<Double>> featureVectorByFile) {
+		try {
+			Class.forName(driver).newInstance();
+			Connection conn = null;
+	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
+	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
+	        conn.setAutoCommit(false);
+	        
+	        for(Map.Entry<String, List<Double>> entry : featureVectorByFile.entrySet()) {
+	       		try {
+	       			StringBuilder sql = new StringBuilder("Update metadata set fv1 = ? and fv2 = ? and fv3 = ? and fv4 = ? and fv5 = ? where file_name = ?" );
+		       		PreparedStatement statement = conn.prepareStatement(sql.toString());	
+		       		int i=1;
+		       		for(Double value : entry.getValue()) {
+		       			statement.setDouble(i, value);	
+		       			i++;
+		       		}
+		       		statement.setString(6, entry.getKey());
+		       		statement.executeUpdate();	
+			        statement.close();	
+	       		}catch(Exception e) {
+	       			System.out.println("Problem writing feature vector for file :" + entry.getKey());
+	       		}
+	        }
+	        conn.commit();	        
+	        conn.close();
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
 } 
