@@ -114,7 +114,7 @@ public class MetaDataDao {
 	        conn.setAutoCommit(false);
 	        preparedStatement  = conn.prepareStatement("Insert into metadata (office_no,file_num,appl,filler2,rec_status,"
 	        		+ "call_date, TSR,rec_duration,f_path,sample_rate,order_num,rec_addi_status,"
-	        		+ "listid,start_time,end_time,station,device_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        		+ "listid,start_time,end_time,station,device_name, file_name) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	        long startTime = System.currentTimeMillis();
 	        int totalCount = 0;
 	        for(String[] queryParameter : queryList) {
