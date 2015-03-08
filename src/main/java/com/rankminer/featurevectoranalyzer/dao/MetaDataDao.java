@@ -8,8 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
+import com.rankminer.featurevectoranalyzer.configuration.MetaDataConfig;
 import com.rankminer.featurevectoranalyzer.model.MetaDataModel;
+import com.rankminer.featurevectoranalyzer.utils.EmailHandler;
 
 /**
  * DAO class to write to metadata table in the rpm db.
@@ -40,10 +44,10 @@ public class MetaDataDao {
 			Connection conn = null;
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
-	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in(?,?) and"
+	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in "+ 
+	        		prepareResultSet(configuration.getMetadataConfig())+" and"
 	        		+ " rank_miner_status IS NULL");
-	        preparedStatement.setString(1, configuration.getMetadataConfig().getProcessStatusCode().get(0));
-	        preparedStatement.setString(2, configuration.getMetadataConfig().getProcessStatusCode().get(1));
+	        setResultSet(preparedStatement, configuration.getMetadataConfig());
 	        ResultSet rs = preparedStatement.executeQuery();
 	        while (rs.next()) {
 	        	MetaDataModel model = new MetaDataModel.MetaDataModelBuilder().setFilePath(rs.getString("f_path")).
@@ -55,11 +59,41 @@ public class MetaDataDao {
 	        	modelList.add(model);
 	        }
 		}  catch (Exception e) {
-			System.out.println("Problem reading MetaData record by rec_status");
+			ApplicationLauncher.logger.severe("Problem reading MetaData record by rec_status. Exception " + e.getMessage());
+			EmailHandler.emailEvent("Problem reading MetaData record by rec_status. Exception " + e.getMessage());
 		};
 		return modelList;
 	}
 
+	/**
+	 * Add processStatusCode to the prepared statement.
+	 * @param preparedStatement
+	 * @throws SQLException 
+	 */
+	private void setResultSet(PreparedStatement preparedStatement, MetaDataConfig metaDataConfig) throws SQLException {
+		List<String> processCodes = metaDataConfig.getProcessStatusCode();
+		int i = 1;
+		for(String processCode : processCodes) {
+			preparedStatement.setString(i, processCode);
+			i++;
+		}
+	}
+	
+	
+	private String prepareResultSet(MetaDataConfig metaDataConfig) {
+		List<String> processCodes = metaDataConfig.getProcessStatusCode();
+		StringBuilder builder = new StringBuilder();
+		builder.append("(");
+		for(String processCode : processCodes) {
+			builder.append("?,");
+		}
+		
+		builder.deleteCharAt(builder.toString().length()-1);
+		builder.append(")");
+		return builder.toString();
+	}
+	
+	
 	/**
 	 * Update the rec_addi_status field of the metadata table whose mdId is passed into the function.
 	 * @param statusCode
@@ -71,9 +105,6 @@ public class MetaDataDao {
 			Connection conn = null;
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
-	        
-	        
-	        
 	        StringBuilder sql = new StringBuilder("Update metadata set rank_miner_status = ? where md_id in (" );
 	        conn.setAutoCommit(false);
 	        for( String id : mdIdList) {
@@ -95,7 +126,8 @@ public class MetaDataDao {
             conn.close();
 	        System.out.println(" "+ updateCount + " rows updated in metadata table");
 		}catch(Exception e) {
-			System.out.println(e.getMessage());
+			EmailHandler.emailEvent("Problem updating scp code status. Error - \t " + e.getMessage());
+			ApplicationLauncher.logger.severe("Problem updating scp code status. Error - \t  " + e.getMessage());
 		}
 	}
 	
@@ -103,7 +135,7 @@ public class MetaDataDao {
 	 * Write data from the metadata csv into the metadata table.
 	 * @param queryList
 	 */
-	public void writeBatch(List<String[]> queryList) {
+	public void writeBatchRpm(List<String[]> queryList) {
 		int count = 0;
 		try {
 			Class.forName(driver).newInstance();
@@ -149,15 +181,77 @@ public class MetaDataDao {
 		        	count++;
 		        	totalCount ++;
 	        	}catch(Exception e) {
+	        		ApplicationLauncher.logger.severe("Dropping record no."+ count +" due to "+ e.getMessage());		
+	        	}	        		
+	        }
+	        commitRecords(preparedStatement, conn);
+            preparedStatement.close();
+            conn.close();
+            ApplicationLauncher.logger.info("Database[rpm] - Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
+		} catch (Exception e) {	
+			ApplicationLauncher.logger.severe("Problem writing record "+  count +"to the database[rpm] "+ e.getMessage());
+			EmailHandler.emailEvent("Problem writing record to the database[rpm]. Error -- "+ e.getMessage());
+		}
+	}
+	
+	
+	/**
+	 * Write data from the metadata csv into the metadata table.
+	 * @param queryList
+	 */
+	public void writeBatchDci(List<String[]> queryList) {
+		int count = 0;
+		try {
+			Class.forName(driver).newInstance();
+			Connection conn = null;
+	        PreparedStatement preparedStatement = null;
+	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
+	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
+	        conn.setAutoCommit(false);
+	        preparedStatement  = conn.prepareStatement("Insert into metadata (account,session_id,audio_file_name,call_center_id,call_center_name,"
+	        		+ "skill_id, skill_name,call_start_time,call_end_time,ani,phone_dailed,agent_id,"
+	        		+ "agent_extension,call_direct,unit,client_key,filesize, rec_status) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        long startTime = System.currentTimeMillis();
+	        int totalCount = 0;
+	        for(String[] queryParameter : queryList) {
+	        	try {
+		        	preparedStatement.setString(1,queryParameter[0]);
+		        	preparedStatement.setString(2,queryParameter[1]);
+		        	preparedStatement.setString(3,queryParameter[2]);
+		        	preparedStatement.setString(4,queryParameter[3]);
+		        	preparedStatement.setString(5,queryParameter[4]);
+					preparedStatement.setString(6, queryParameter[5]);
+					preparedStatement.setString(7, queryParameter[6]);
+					preparedStatement.setString(8, queryParameter[7]);
+					preparedStatement.setString(9, queryParameter[8]);
+					preparedStatement.setString(10, queryParameter[9]);
+					preparedStatement.setString(11, queryParameter[10]);
+					preparedStatement.setString(12, queryParameter[11]);
+					preparedStatement.setString(13, queryParameter[12]);
+					preparedStatement.setString(14, queryParameter[13]);
+					preparedStatement.setString(15,queryParameter[14]);
+					preparedStatement.setString(16, queryParameter[15]);
+					preparedStatement.setString(17, queryParameter[16]);
+					preparedStatement.setString(18, queryParameter[17]);
+					
+		        	preparedStatement.addBatch();
+		        	if(count %1000 == 0) {
+	        			count = 0;
+	        			commitRecords(preparedStatement, conn);
+	        		}
+		        	count++;
+		        	totalCount ++;
+	        	}catch(Exception e) {
 	        		System.out.println("Dropping record no."+ count +" due to "+ e.getMessage());		
 	        	}	        		
 	        }
 	        commitRecords(preparedStatement, conn);
             preparedStatement.close();
             conn.close();
-            System.out.println("Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
-		} catch (Exception e) {			
-			System.out.println("Problem writing record "+  count +"to the database "+ e.getMessage());
+            ApplicationLauncher.logger.info("Database[dci] - Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
+		} catch (Exception e) {	
+			ApplicationLauncher.logger.severe("Problem writing record "+  count +"to the database[dco] "+ e.getMessage());
+			EmailHandler.emailEvent("Problem writing record to the database[dci]. Error -- "+ e.getMessage());
 		}
 	}
 	
@@ -201,13 +295,16 @@ public class MetaDataDao {
 		       		statement.executeUpdate();	
 			        statement.close();	
 	       		}catch(Exception e) {
+	       			ApplicationLauncher.logger.severe("Problem writing feature vector for file " + entry.getKey());
+	       			EmailHandler.emailEvent("Problem writing feature vector for file :" + entry.getKey() + " Error - " + e.getMessage());
 	       			System.out.println("Problem writing feature vector for file :" + entry.getKey());
 	       		}
 	        }
 	        conn.commit();	        
 	        conn.close();
 		}catch(Exception e) {
-			System.out.println(e.getMessage());
+			ApplicationLauncher.logger.severe("Problem with updating metadata table. Error -- " + e.getMessage());
+   			EmailHandler.emailEvent("Problem with updating metadata table. Error -- " + e.getMessage());
 		}
 	}
 } 
