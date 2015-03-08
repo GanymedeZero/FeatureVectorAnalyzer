@@ -17,6 +17,9 @@
 				<userName>admin</userName>
 				<password>admin</password>
 				<hostName>10.01.22.22</hostName>
+				<recStatusCodeList>
+					<recStatusCode>2</recStatusCode>
+				</recStatusCodeList>
 			</scpConfig>
 			<dbConfiguration>
 				<userName>admin</userName>
@@ -40,6 +43,9 @@
 				<userName>admin</userName>
 				<password>admin</password>
 				<hostName>10.01.22.22</hostName>
+				<recStatusCodeList>
+					<recStatusCode>2</recStatusCode>
+				</recStatusCodeList>
 			</scpConfig>
 			<dbConfiguration>
 				<userName>admin</userName>

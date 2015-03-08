@@ -8,9 +8,13 @@
 
 package com.rankminer.featurevectoranalyzer.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -42,7 +46,8 @@ import javax.xml.bind.annotation.XmlType;
     "destinationFolder",
     "userName",
     "password",
-    "hostName"
+    "hostName",
+    "recStatusCode"
 })
 public class SCPConfig {
 
@@ -54,8 +59,23 @@ public class SCPConfig {
     protected String password;
     @XmlElement(required = true)
     protected String hostName;
+    @XmlElementWrapper(name="recStatusCodeList")
+	@XmlElement(required=false)
+	protected List<String> recStatusCode;
+	
 
-    /**
+    public List<String> getRecStatusCode() {
+    	if(recStatusCode == null) {
+    		recStatusCode = new ArrayList<String>();
+    	}
+		return recStatusCode;
+	}
+
+	public void setRecStatusCode(List<String> recStatusCode) {
+		this.recStatusCode = recStatusCode;
+	}
+
+	/**
      * Gets the value of the destinationFolder property.
      * 
      * @return
