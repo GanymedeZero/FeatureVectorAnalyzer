@@ -13,10 +13,12 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.scp.SCPFileTransfer;
 
+import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.commands.TaskInterface;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.dao.MetaDataDao;
 import com.rankminer.featurevectoranalyzer.model.MetaDataModel;
+import com.rankminer.featurevectoranalyzer.utils.EmailHandler;
 
 /**
  * SCP copies the files from remote server
@@ -39,7 +41,7 @@ public class ScpTask implements TaskInterface {
 	public void downloadFiles(Configuration configuration) {
 		try {
 			MetaDataDao dao = new MetaDataDao(configuration);
-			List<MetaDataModel> modelList = dao.getMetaDataModelByRecStatus();
+			List<MetaDataModel> modelList = dao.getMetaDataModelByRecStatus(configuration.getSCPConfig().getRecStatusCode());
 			Map<Integer, String> filePaths = new HashMap<Integer, String>();
 			for (MetaDataModel model : modelList) {
 				// f_path + "/"+ office_no + file_num + appl + ".vox"
@@ -85,7 +87,7 @@ public class ScpTask implements TaskInterface {
 
 			for (Map.Entry<Integer, String> filePath : filePaths.entrySet()) {
 				try {
-					System.out.println("Copying file "
+					ApplicationLauncher.logger.info("Copying file "
 							+ filePath
 							+ " to destination "
 							+ configuration.getSCPConfig()
@@ -93,10 +95,15 @@ public class ScpTask implements TaskInterface {
 					transfer.download(filePath.getValue(), configuration
 							.getSCPConfig().getDestinationFolder());
 					fileCounter++;
+					
 					successEntries.put(filePath.getKey(), filePath.getValue());
 				} catch (Exception e) {
-					System.out.println("Problem occured during scp of file "
+					ApplicationLauncher.logger.severe("Problem occured during scp of file "
 							+ filePath.getValue());
+					
+					EmailHandler.emailEvent("Environment [ "+configuration.getEnvironment() +" Problem occured during scp of file "
+							+ filePath.getValue() + " Error - " + e.getMessage());
+					
 					errorEntries.put(filePath.getKey(), filePath.getValue());
 				}
 			}

@@ -37,7 +37,7 @@ public class MetaDataDao {
 	 * rec_addi_status is either empty or null.
 	 * @return List<MetaDataModel>
 	 */
-	public List<MetaDataModel> getMetaDataModelByRecStatus() {
+	public List<MetaDataModel> getMetaDataModelByRecStatus(List<String> recStatusList) {
 		List<MetaDataModel> modelList = new ArrayList<MetaDataModel>();
 		try {
 			Class.forName(driver).newInstance();
@@ -45,7 +45,7 @@ public class MetaDataDao {
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
 	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in "+ 
-	        		prepareResultSet(configuration.getMetadataConfig())+" and"
+	        		prepareResultSet(recStatusList)+" and"
 	        		+ " rank_miner_status IS NULL");
 	        setResultSet(preparedStatement, configuration.getMetadataConfig());
 	        ResultSet rs = preparedStatement.executeQuery();
@@ -80,11 +80,10 @@ public class MetaDataDao {
 	}
 	
 	
-	private String prepareResultSet(MetaDataConfig metaDataConfig) {
-		List<String> processCodes = metaDataConfig.getProcessStatusCode();
+	private String prepareResultSet(List<String> recStatuses) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("(");
-		for(String processCode : processCodes) {
+		for(String processCode : recStatuses) {
 			builder.append("?,");
 		}
 		
@@ -218,6 +217,10 @@ public class MetaDataDao {
 		        	preparedStatement.setString(1,queryParameter[0]);
 		        	preparedStatement.setString(2,queryParameter[1]);
 		        	preparedStatement.setString(3,queryParameter[2]);
+		        	if(queryParameter[3].contains("NULL")) {
+		        		ApplicationLauncher.logger.warning("Dropping metadata record since audio file name is null");
+		        		continue;
+		        	}
 		        	preparedStatement.setString(4,queryParameter[3]);
 		        	preparedStatement.setString(5,queryParameter[4]);
 					preparedStatement.setString(6, queryParameter[5]);
