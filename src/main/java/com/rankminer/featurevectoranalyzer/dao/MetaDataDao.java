@@ -123,7 +123,7 @@ public class MetaDataDao {
 	        conn.commit();
 	        statement.close();
             conn.close();
-	        System.out.println(" "+ updateCount + " rows updated in metadata table");
+	        ApplicationLauncher.logger.info(" "+ updateCount + " rows updated in metadata table for environment: "+ configuration.getEnvironment());
 		}catch(Exception e) {
 			EmailHandler.emailEvent("Problem updating scp code status. Error - \t " + e.getMessage());
 			ApplicationLauncher.logger.severe("Problem updating scp code status. Error - \t  " + e.getMessage());
@@ -211,15 +211,15 @@ public class MetaDataDao {
 	        		+ "skill_id, skill_name,call_start_time,call_end_time,ani,phone_dailed,agent_id,"
 	        		+ "agent_extension,call_direct,unit,client_key,filesize, rec_status) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	        long startTime = System.currentTimeMillis();
-	        int totalCount = 0;
+	        int totalCount = 1;
 	        for(String[] queryParameter : queryList) {
 	        	try {
+	        		int status = 0;
 		        	preparedStatement.setString(1,queryParameter[0]);
 		        	preparedStatement.setString(2,queryParameter[1]);
 		        	preparedStatement.setString(3,queryParameter[2]);
 		        	if(queryParameter[3].contains("NULL")) {
-		        		ApplicationLauncher.logger.warning("Dropping metadata record since audio file name is null");
-		        		continue;
+		        		ApplicationLauncher.logger.warning("Audio file name null for record " + totalCount);
 		        	}
 		        	preparedStatement.setString(4,queryParameter[3]);
 		        	preparedStatement.setString(5,queryParameter[4]);
@@ -237,6 +237,13 @@ public class MetaDataDao {
 					preparedStatement.setString(17, queryParameter[16]);
 					preparedStatement.setString(18, queryParameter[17]);
 					
+					if(!queryParameter[3].contains("NULL") && queryParameter[18].contains("Unresolved") && queryParameter[13].contains("Outbound")) {
+						status = 1;
+					}
+					
+					preparedStatement.setInt(19, status);
+					
+					
 		        	preparedStatement.addBatch();
 		        	if(count %1000 == 0) {
 	        			count = 0;
@@ -245,7 +252,8 @@ public class MetaDataDao {
 		        	count++;
 		        	totalCount ++;
 	        	}catch(Exception e) {
-	        		System.out.println("Dropping record no."+ count +" due to "+ e.getMessage());		
+	        		ApplicationLauncher.logger.severe("Dropping record no."+ count +" due to "+ e.getMessage());
+	        		EmailHandler.emailEvent("Problem writing to the db on environment: " + configuration.getEnvironment() + " Error: " + e.getMessage());
 	        	}	        		
 	        }
 	        commitRecords(preparedStatement, conn);
@@ -263,7 +271,7 @@ public class MetaDataDao {
 		connection.commit();
 		connection.setAutoCommit(false);
 		statement.clearBatch();
-		System.out.println("Committed " + updateCounts.length + " objects");
+		ApplicationLauncher.logger.info("Committed " + updateCounts.length + " objects for environment: " + configuration.getEnvironment());
 	}
 	
 	public static String convertToDate(String date) {

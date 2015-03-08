@@ -6,8 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.model.FckResourceModel;
+import com.rankminer.featurevectoranalyzer.utils.EmailHandler;
 
 /**
  * Dao class to handle data access to FCK_RESOURCE table.
@@ -50,7 +53,10 @@ public class FckResourceDao {
 	        preparedStatement.close();
 	        conn.close();
 		}catch(Exception e) {
-			System.out.println("Problem retrieving FckResource by File_Status[Processed]. Error " +e.getMessage());
+			ApplicationLauncher.logger.severe("Problem retrieving FckResource by File_Status[Processed] environment: "+
+					configuration.getEnvironment()+" Error " +e.getMessage());
+			EmailHandler.emailEvent("Problem retrieving FckResource by File_Status[Processed] environment: "+
+					configuration.getEnvironment()+" Error " +e.getMessage());
 		}
 		return modelList;
 	}
