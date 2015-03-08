@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
+import com.rankminer.featurevectoranalyzer.configuration.MetaDataConfig;
 import com.rankminer.featurevectoranalyzer.model.MetaDataModel;
 
 /**
@@ -40,10 +42,10 @@ public class MetaDataDao {
 			Connection conn = null;
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
-	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in(?,?) and"
+	        PreparedStatement preparedStatement = conn.prepareStatement("select md_id, f_path, office_no, file_num, appl from metadata where rec_status in "+ 
+	        		prepareResultSet(configuration.getMetadataConfig())+" and"
 	        		+ " rank_miner_status IS NULL");
-	        preparedStatement.setString(1, configuration.getMetadataConfig().getProcessStatusCode().get(0));
-	        preparedStatement.setString(2, configuration.getMetadataConfig().getProcessStatusCode().get(1));
+	        setResultSet(preparedStatement, configuration.getMetadataConfig());
 	        ResultSet rs = preparedStatement.executeQuery();
 	        while (rs.next()) {
 	        	MetaDataModel model = new MetaDataModel.MetaDataModelBuilder().setFilePath(rs.getString("f_path")).
@@ -61,6 +63,35 @@ public class MetaDataDao {
 	}
 
 	/**
+	 * Add processStatusCode to the prepared statement.
+	 * @param preparedStatement
+	 * @throws SQLException 
+	 */
+	private void setResultSet(PreparedStatement preparedStatement, MetaDataConfig metaDataConfig) throws SQLException {
+		List<String> processCodes = metaDataConfig.getProcessStatusCode();
+		int i = 1;
+		for(String processCode : processCodes) {
+			preparedStatement.setString(i, processCode);
+			i++;
+		}
+	}
+	
+	
+	private String prepareResultSet(MetaDataConfig metaDataConfig) {
+		List<String> processCodes = metaDataConfig.getProcessStatusCode();
+		StringBuilder builder = new StringBuilder();
+		builder.append("(");
+		for(String processCode : processCodes) {
+			builder.append("?,");
+		}
+		
+		builder.deleteCharAt(builder.toString().length()-1);
+		builder.append(")");
+		return builder.toString();
+	}
+	
+	
+	/**
 	 * Update the rec_addi_status field of the metadata table whose mdId is passed into the function.
 	 * @param statusCode
 	 * @param mdIdList
@@ -71,9 +102,6 @@ public class MetaDataDao {
 			Connection conn = null;
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
-	        
-	        
-	        
 	        StringBuilder sql = new StringBuilder("Update metadata set rank_miner_status = ? where md_id in (" );
 	        conn.setAutoCommit(false);
 	        for( String id : mdIdList) {

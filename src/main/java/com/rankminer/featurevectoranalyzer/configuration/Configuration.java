@@ -37,14 +37,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "configuration", propOrder = {
+	"environment",
 	"delimiter",
     "scpConfig",
     "dbConfiguration",
     "metadataConfig"
 })
-@XmlRootElement
 public class Configuration {
-	
+	@XmlElement(required=true)
+	protected String environment;
 	@XmlElement(required=true)
 	protected String delimiter;
 	@XmlElement(required = true)
@@ -133,6 +134,15 @@ public class Configuration {
     public void setMetaDataConfig(MetaDataConfig value) {
         this.metadataConfig = value;
     }
+    
+    public String getEnvironment() {
+		return environment;
+	}
+
+	public void setEnvironment(String environment) {
+		this.environment = environment;
+	}
+
 
 
 }
