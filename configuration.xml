@@ -5,7 +5,7 @@
 		<hostName>smtp.googlemail.com</hostName>
 		<smtpPort>465</smtpPort>
 		<senderEmail>amit.rankminer@gmail.com</senderEmail>
-		<receiverEmail>ehammel@rankminer.com</receiverEmail>
+		<receiverEmail>ehammel@rankminer.com;achavan1@gmail.com</receiverEmail>
 		<userName>amit.rankminer</userName>
 		<password>rankminer</password>
 	</emailConfig>

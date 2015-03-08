@@ -92,6 +92,7 @@ public class ScpTask implements TaskInterface {
 									.getDestinationFolder());
 					transfer.download(filePath.getValue(), configuration
 							.getSCPConfig().getDestinationFolder());
+					
 					fileCounter++;
 					successEntries.put(filePath.getKey(), filePath.getValue());
 				} catch (Exception e) {

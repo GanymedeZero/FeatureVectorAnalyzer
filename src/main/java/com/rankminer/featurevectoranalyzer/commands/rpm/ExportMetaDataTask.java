@@ -37,7 +37,7 @@ public class ExportMetaDataTask implements TaskInterface {
 	        }
 			
 			MetaDataDao dao = new MetaDataDao(configuration);
-			dao.writeBatch(queryList);
+			dao.writeBatchRpm(queryList);
 		}catch(Exception e) {
 			ApplicationLauncher.logger.severe("Problem reading file "+ e.getMessage());
 		}finally {
