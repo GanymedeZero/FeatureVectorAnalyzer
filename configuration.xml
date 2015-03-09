@@ -37,8 +37,8 @@
 				<scpFailureCode>2</scpFailureCode>
 			</metadataConfig>
 			<copyConfig>
-				<destinationFolder>/Users/tanyajadhav/amit/Projects/RankMiner/dest/</destinationFolder>
-				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/source/</sourceFolder>
+				<destinationFolder>/home/files/audio/to_process/</destinationFolder>
+				<sourceFolder>/home/files/audio/incoming/</sourceFolder>
 				<status>1</status>
 			</copyConfig>
 		</configuration>
