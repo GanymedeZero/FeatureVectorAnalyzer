@@ -39,7 +39,7 @@ public class EmailHandler {
 	 */
 	private static String[] findReceiverEmails(String email) {
 		String[] emailIds = null;
-		if(email.contains(":")) {
+		if(email.contains(";")) {
 			emailIds = email.split(";");
 		} else {
 			emailIds = new String[1];

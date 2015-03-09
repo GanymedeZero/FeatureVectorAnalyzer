@@ -1,7 +1,7 @@
 package com.rankminer.featurevectoranalyzer.commands;
 
-import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher.TaskType;
+import com.rankminer.featurevectoranalyzer.commands.dci.CopyFileTask;
 import com.rankminer.featurevectoranalyzer.commands.dci.ExportMetaDataTask;
 import com.rankminer.featurevectoranalyzer.commands.dci.ExtractFeatureVectorTask;
 import com.rankminer.featurevectoranalyzer.commands.dci.ScpTask;
@@ -23,6 +23,9 @@ public class DciTaskFactory implements  TaskFactory {
 			
 			case TRANSLATEXMLTOCSV:
 				return new TranslateFVToCsvTask();
+				
+			case COPYFILE:
+				return new CopyFileTask();
 			default:
 				break;
 		}

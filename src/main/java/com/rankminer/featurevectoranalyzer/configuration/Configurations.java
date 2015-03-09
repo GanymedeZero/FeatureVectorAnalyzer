@@ -89,8 +89,13 @@ public class Configurations {
         return this.configurationList;
     }
 
-	public Configuration getConfiguration(String string) {
-		return configurationList.get(0);
+	public Configuration getConfiguration(String env) {
+		if(configurationMap.size() == 0) {
+			for(Configuration config : configurationList) {
+				configurationMap.put(config.getEnvironment(), config);
+			}
+		}
+		return configurationMap.get(env);
 	}
 	
 	public EmailConfiguration getEmailConfiguration() {

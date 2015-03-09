@@ -1,13 +1,17 @@
 package com.rankminer.featurevectoranalyzer.dao;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
@@ -317,5 +321,35 @@ public class MetaDataDao {
 			ApplicationLauncher.logger.severe("Problem with updating metadata table. Error -- " + e.getMessage());
    			EmailHandler.emailEvent("Problem with updating metadata table. Error -- " + e.getMessage());
 		}
+	}
+	
+	public List<String> findFilesToCopy(int status) {
+		List<String> fileNames = new ArrayList<String>();
+		Connection conn = null;
+		try {
+			Class.forName(driver).newInstance();
+			
+	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
+	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
+	        
+	        PreparedStatement statement = conn.prepareStatement("SELECT * FROM metadata where status=?");
+	        statement.setInt(1, status);
+	        ResultSet res = statement.executeQuery();
+	        while (res.next()) {
+	        	String fileName = res.getString("audio_file_name");
+	        	fileNames.add(fileName);
+	        }
+		}  catch (Exception e) {
+			ApplicationLauncher.logger.severe("Environment: " +configuration.getEnvironment() + " Problem reading MetaData record by status. Exception " + e.getMessage());
+			EmailHandler.emailEvent("Environment: " +configuration.getEnvironment() + " Problem reading MetaData record by status. Exception " + e.getMessage());
+		}finally{
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return fileNames;
 	}
 } 

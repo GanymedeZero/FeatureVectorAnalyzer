@@ -50,7 +50,7 @@ public final class ApplicationLauncher {
 	
 	
 	public enum TaskType {
-        EXPORTMETADATA(1), SCPCOPY(2), TRANSLATEXMLTOCSV(3), EXTRACTFV(4);
+        EXPORTMETADATA(1), SCPCOPY(2), TRANSLATEXMLTOCSV(3), EXTRACTFV(4), COPYFILE(5);
         private int value;
 
         private TaskType(int value) {
@@ -82,7 +82,7 @@ public final class ApplicationLauncher {
 		return factory;
 	}
 	
-	private static final String[] commands = {"exit","extract", "scp-copy", "show-env","export-metadata","translate", "usage","quit"};
+	private static final String[] commands = {"exit","extract", "scp-copy","copy","show-env","export-metadata","translate", "usage","quit"};
 	
 	public static void writeConfiguration() throws JAXBException {
 		File file = new File("configurationt.xml");
@@ -181,6 +181,8 @@ public final class ApplicationLauncher {
             		executeCommand(command, TaskType.TRANSLATEXMLTOCSV);
             	} else if(command.contains("show-env")) {
             		showEnvironment();
+            	} else if(command.contains("copy")) {
+            		executeCommand(command, TaskType.COPYFILE);
             	}
             }
 		} catch (Exception e) {

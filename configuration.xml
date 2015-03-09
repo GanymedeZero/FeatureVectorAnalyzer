@@ -36,6 +36,11 @@
 				<scpSuccessCode>1</scpSuccessCode>
 				<scpFailureCode>2</scpFailureCode>
 			</metadataConfig>
+			<copyConfig>
+				<destinationFolder>/Users/tanyajadhav/amit/Projects/RankMiner/dest/</destinationFolder>
+				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/source/</sourceFolder>
+				<status>1</status>
+			</copyConfig>
 		</configuration>
 		<configuration>
 			<environment>rpm</environment>
