@@ -12,6 +12,7 @@
 	<configurationList>
 		<configuration>
 			<environment>dci</environment>
+			<delimiter>,</delimiter>
 			<scpConfig>
 				<destinationFolder>/opt/rankminer/to_process</destinationFolder>
 				<userName>admin</userName>
@@ -22,9 +23,9 @@
 				</recStatusCodeList>
 			</scpConfig>
 			<dbConfiguration>
-				<userName>admin</userName>
+				<userName>root</userName>
 				<password>admin</password>
-				<hostName>server</hostName>
+				<hostName>localhost</hostName>
 				<dbName>rankminer</dbName>
 			</dbConfiguration>
 			<metadataConfig>
@@ -38,6 +39,7 @@
 		</configuration>
 		<configuration>
 			<environment>rpm</environment>
+			<delimiter>\|</delimiter>
 			<scpConfig>
 				<destinationFolder>/opt/rankminer/to_process</destinationFolder>
 				<userName>admin</userName>

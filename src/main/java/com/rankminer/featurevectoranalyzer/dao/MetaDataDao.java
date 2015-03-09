@@ -207,9 +207,9 @@ public class MetaDataDao {
 	        conn = DriverManager.getConnection(String.format(url, configuration.getDbConfiguration().getHostName()) + configuration.getDbConfiguration().getDbName(), 
 	        		configuration.getDbConfiguration().getUserName(), configuration.getDbConfiguration().getPassword());
 	        conn.setAutoCommit(false);
-	        preparedStatement  = conn.prepareStatement("Insert into metadata (account,session_id,audio_file_name,call_center_id,call_center_name,"
-	        		+ "skill_id, skill_name,call_start_time,call_end_time,ani,phone_dailed,agent_id,"
-	        		+ "agent_extension,call_direct,unit,client_key,filesize, rec_status) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+	        preparedStatement  = conn.prepareStatement("Insert into metadata (account,session_id,audio_file_name,call_center,call_center_name,"
+	        		+ "skill_id, skill_name,call_start_time,call_end_time,ani,phone_dialed,agent_id,"
+	        		+ "agent_extension,call_direct,unit,client_key,filesize, rec_status,status) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 	        long startTime = System.currentTimeMillis();
 	        int totalCount = 1;
 	        for(String[] queryParameter : queryList) {
@@ -245,12 +245,12 @@ public class MetaDataDao {
 					
 					
 		        	preparedStatement.addBatch();
+		        	count++;
+		        	totalCount ++;
 		        	if(count %1000 == 0) {
 	        			count = 0;
 	        			commitRecords(preparedStatement, conn);
 	        		}
-		        	count++;
-		        	totalCount ++;
 	        	}catch(Exception e) {
 	        		ApplicationLauncher.logger.severe("Dropping record no."+ count +" due to "+ e.getMessage());
 	        		EmailHandler.emailEvent("Problem writing to the db on environment: " + configuration.getEnvironment() + " Error: " + e.getMessage());
