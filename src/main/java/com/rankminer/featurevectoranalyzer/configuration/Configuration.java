@@ -41,21 +41,32 @@ import javax.xml.bind.annotation.XmlType;
 	"delimiter",
     "scpConfig",
     "dbConfiguration",
-    "metadataConfig"
+    "metadataConfig",
+    "copyConfig"
 })
 public class Configuration {
 	@XmlElement(required=true)
 	protected String environment;
 	@XmlElement(required=true)
 	protected String delimiter;
-	@XmlElement(required = true)
+	@XmlElement(required = false)
     protected SCPConfig scpConfig;
     @XmlElement(required = true)
     protected DbConfiguration dbConfiguration;
     @XmlElement(required = true)
     protected MetaDataConfig metadataConfig;
+    @XmlElement(required=false)
+    protected CopyConfig copyConfig;
     
-    /**
+    public CopyConfig getCopyConfig() {
+		return copyConfig;
+	}
+
+	public void setCopyConfig(CopyConfig copyConfig) {
+		this.copyConfig = copyConfig;
+	}
+
+	/**
      * Gets the value of the ftp property.
      * 
      * @return

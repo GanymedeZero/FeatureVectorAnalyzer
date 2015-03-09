@@ -1,6 +1,7 @@
 package com.rankminer.featurevectoranalyzer.commands;
 
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher.TaskType;
+import com.rankminer.featurevectoranalyzer.commands.rpm.CopyFileTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.ExportMetaDataTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.ExtractFeatureVectorTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.ScpTask;
@@ -21,6 +22,9 @@ public class RpmTaskFactory implements TaskFactory {
 	
 			case TRANSLATEXMLTOCSV:
 				return new TranslateFVToCsvTask();
+			
+			case COPYFILE:
+				return new CopyFileTask();
 			default:
 				break;
 		}

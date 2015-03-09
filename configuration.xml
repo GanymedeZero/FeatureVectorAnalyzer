@@ -12,6 +12,7 @@
 	<configurationList>
 		<configuration>
 			<environment>dci</environment>
+			<delimiter>,</delimiter>
 			<scpConfig>
 				<destinationFolder>/opt/rankminer/to_process</destinationFolder>
 				<userName>admin</userName>
@@ -22,9 +23,9 @@
 				</recStatusCodeList>
 			</scpConfig>
 			<dbConfiguration>
-				<userName>admin</userName>
+				<userName>root</userName>
 				<password>admin</password>
-				<hostName>server</hostName>
+				<hostName>localhost</hostName>
 				<dbName>rankminer</dbName>
 			</dbConfiguration>
 			<metadataConfig>
@@ -35,9 +36,15 @@
 				<scpSuccessCode>1</scpSuccessCode>
 				<scpFailureCode>2</scpFailureCode>
 			</metadataConfig>
+			<copyConfig>
+				<destinationFolder>/home/files/audio/to_process/</destinationFolder>
+				<sourceFolder>/home/files/audio/incoming/</sourceFolder>
+				<status>1</status>
+			</copyConfig>
 		</configuration>
 		<configuration>
 			<environment>rpm</environment>
+			<delimiter>\|</delimiter>
 			<scpConfig>
 				<destinationFolder>/opt/rankminer/to_process</destinationFolder>
 				<userName>admin</userName>

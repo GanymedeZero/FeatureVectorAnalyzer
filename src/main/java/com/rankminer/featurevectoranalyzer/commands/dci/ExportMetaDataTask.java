@@ -28,11 +28,18 @@ public class ExportMetaDataTask implements TaskInterface {
 			BufferedReader reader = null;
 			for(File f : files) {
 				try {
+					int index = 1;
 					reader = new BufferedReader(new FileReader(f));
 					String data;
 					List<String[]> queryList = new ArrayList<String[]>();
 					while (( data = reader.readLine()) != null) {
 			              String[] rec = data.split(configuration.getDelimiter());
+			              // Skip the header from the excel
+			              if(index == 1) {
+			            	  index++;
+			            	  continue;
+			              }
+			              index++;
 			              queryList.add(rec);
 			        }
 					MetaDataDao dao = new MetaDataDao(configuration);
@@ -58,7 +65,6 @@ public class ExportMetaDataTask implements TaskInterface {
 		File fileDir = new File(directory);
 		FilenameFilter csvFileFilter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				if(dir.isDirectory()) return false;
 				String lowercaseName = name.toLowerCase();
 				if (lowercaseName.endsWith(".csv")) {
 					return true;
