@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configurations
 	xmlns="http://www.featurevectoranalyzer.rankminer.com/configuration">
+	<!-- email config section to add support for emails. application sends emails in case of severe error. -->
 	<emailConfig>
 		<hostName>smtp.googlemail.com</hostName>
 		<smtpPort>465</smtpPort>
 		<senderEmail>amit.rankminer@gmail.com</senderEmail>
+		<!-- ';' delimited email list for people interested in receiving alert emails for severe errors. -->
 		<receiverEmail>ehammel@rankminer.com;achavan1@gmail.com</receiverEmail>
 		<userName>amit.rankminer</userName>
 		<password>rankminer</password>
 	</emailConfig>
 	<configurationList>
 		<configuration>
+			<!-- environment name is required attribute -->
 			<environment>dci</environment>
 			<delimiter>,</delimiter>
 			<scpConfig>
@@ -28,6 +31,12 @@
 				<hostName>localhost</hostName>
 				<dbName>rankminer</dbName>
 			</dbConfiguration>
+		    <fileScanConfig>
+		        <sourceFolder>/home/files/audio/to_process_wav</sourceFolder>
+		        <fileSuffix>_agent_only.wav</fileSuffix>
+				<rankminer_statusSuccessUpdate>to_process_agentlist</rankminer_statusSuccessUpdate>
+				<rankminer_statusFailureUpdate>orig_entry_not_found</rankminer_statusFailureUpdate>
+		    </fileScanConfig>
 			<metadataConfig>
 				<processStatusCodeList>
 					<processStatusCode>1</processStatusCode>
@@ -41,6 +50,11 @@
 				<sourceFolder>/home/files/audio/incoming/</sourceFolder>
 				<status>1</status>
 			</copyConfig>
+			<dgConfig>
+				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/</sourceFolder>
+				<fileName>rankedlist.csv</fileName>
+				<action>add</action>
+			</dgConfig>
 		</configuration>
 		<configuration>
 			<environment>rpm</environment>
@@ -60,6 +74,11 @@
 				<hostName>server</hostName>
 				<dbName>rankminer</dbName>
 			</dbConfiguration>
+			<dgConfig>
+				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/</sourceFolder>
+				<fileName>rankedlist.csv</fileName>
+				<action>add</action>
+			</dgConfig>
 		</configuration>
 	</configurationList>
 </configurations>

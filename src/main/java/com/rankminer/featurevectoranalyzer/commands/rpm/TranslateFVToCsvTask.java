@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
@@ -51,9 +50,10 @@ public class TranslateFVToCsvTask implements TaskInterface {
 			createCsvFile(resources,destinationFileName);
 			writeFeatureVectorToDb(resources, configuration);
 			filterTopFeatureVectors();
-		} catch (JAXBException e) {
-			ApplicationLauncher.logger.severe("Problems while translating "+ sourceFileName +" file to "+ destinationFileName + " file. Error "+ e.getMessage());
-			EmailHandler.emailEvent("Problems while translating "+ sourceFileName +" file to "+ destinationFileName + " file. Error "+ e.getMessage());
+		} catch (Exception e) {
+			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"]: Problems while translating "+ sourceFileName +" file to "+ destinationFileName + " file. Error "+ e.getMessage());
+			EmailHandler.emailEvent("Problems while translating "+ sourceFileName +" file to "+ destinationFileName + " file. Error "+ e.getMessage(), 
+					"Re["+configuration.getEnvironment()+"]: Problem translating feature vectors");
 		}
 	}
 
@@ -84,25 +84,20 @@ public class TranslateFVToCsvTask implements TaskInterface {
 	 * @param resources
 	 * @param destinationFileName
 	 */
-	private void createCsvFile(Resources resources, String destinationFileName)  {
+	private void createCsvFile(Resources resources, String destinationFileName) throws Exception {
 		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destinationFileName)));
-			for(Resource resource : resources.getResource()) {
-				StringBuilder builder = new StringBuilder();
-				builder.append(resource.getFileName()).append(",");
-				for(double d : resource.getFeatures()) {
-					builder.append(d).append(",");
-				}
-				builder.deleteCharAt( builder.length() -1 );
-				writer.write(builder.toString());
-				writer.newLine();
+		writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destinationFileName)));
+		for(Resource resource : resources.getResource()) {
+			StringBuilder builder = new StringBuilder();
+			builder.append(resource.getFileName()).append(",");
+			for(double d : resource.getFeatures()) {
+				builder.append(d).append(",");
 			}
-			writer.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+			builder.deleteCharAt( builder.length() -1 );
+			writer.write(builder.toString());
+			writer.newLine();
 		}
-		
+		writer.close();
 	}
 	
 

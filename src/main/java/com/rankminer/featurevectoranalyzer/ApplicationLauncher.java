@@ -39,7 +39,7 @@ public final class ApplicationLauncher {
 	
 	static {
 		try {
-			FileHandler handler = new FileHandler("rankminer-app%g.log", 100000000, 9999);
+			FileHandler handler = new FileHandler("rankminer-app%g.log", 100000000, 9999, true);
 			handler.setFormatter(new SimpleFormatter());
 			logger.addHandler(handler);
 			logger.setLevel(Level.INFO);
@@ -50,7 +50,7 @@ public final class ApplicationLauncher {
 	
 	
 	public enum TaskType {
-        EXPORTMETADATA(1), SCPCOPY(2), TRANSLATEXMLTOCSV(3), EXTRACTFV(4), COPYFILE(5);
+        EXPORTMETADATA(1), SCPCOPY(2), TRANSLATEXMLTOCSV(3), EXTRACTFV(4), COPYFILE(5), DAILYGEN(6);
         private int value;
 
         private TaskType(int value) {
@@ -82,7 +82,7 @@ public final class ApplicationLauncher {
 		return factory;
 	}
 	
-	private static final String[] commands = {"exit","extract", "scp-copy","copy","show-env","export-metadata","translate", "usage","quit"};
+	private static final String[] commands = {"daily-gen","exit","extract", "scp-copy","copy","show-env","export-metadata","translate", "usage","quit"};
 	
 	public static void writeConfiguration() throws JAXBException {
 		File file = new File("configurationt.xml");
@@ -183,12 +183,14 @@ public final class ApplicationLauncher {
             		showEnvironment();
             	} else if(command.contains("copy")) {
             		executeCommand(command, TaskType.COPYFILE);
+            	} else if(command.contains("daily-gen")) {
+            		executeCommand(command, TaskType.DAILYGEN);
             	}
             }
 		} catch (Exception e) {
 			System.out.println("Unable to read configuration. Exiting program");
 			logger.severe("Problem reading configuration.xml. Program will shut down. Error -- " + e.getMessage());
-			EmailHandler.emailEvent("Problem reading configuration.xml. Program will shut down");
+			EmailHandler.emailEvent("Problem reading configuration.xml. Program will shut down", "Re: Problems reading configuration.xml");
 			System.exit(0);
 		}		
 	}
@@ -224,9 +226,9 @@ public final class ApplicationLauncher {
 		if(args.length >= 2 && (args[1].contains("dci") || args[1].contains("rpm"))) {
 			env = args[1];
 		} else {
-			EmailHandler.emailEvent("Environment must be passed as the argument to commands. Currently support for dci and rpm environment only");
+			EmailHandler.emailEvent("Environment must be passed as the argument to commands. Currently support for dci and rpm environment only",
+									"Re: Environment variable not passed to command.");
 			logger.severe("Environment must be passed as the argument to commands. Currently support for dci and rpm environment only");
-			System.out.println("Environment must be passed as the argument to commands. Currently support for dci and rpm environment only");
 		}
 		return env;
 	}
@@ -255,6 +257,7 @@ public final class ApplicationLauncher {
 	private static void showUsage(PrintWriter out) {
 		out.println("This application is driven by configuration file.\n"
 				+ "use tab to see what options are supported\n"
+				+ "daily-gen will process ranklist.csv file for that day"
 				+ "export-metadata {environment} {fileName.csv}\n. Reads the csv file and populates metadata table"
 				+ "scp-copy {environment} [Copies audio files from remote machine locally]\n"
 				+ "extract {environment} calls the console-connector application to extract the feature vector blob to xml\n"

@@ -55,8 +55,8 @@ public class FckResourceDao {
 		}catch(Exception e) {
 			ApplicationLauncher.logger.severe("Problem retrieving FckResource by File_Status[Processed] environment: "+
 					configuration.getEnvironment()+" Error " +e.getMessage());
-			EmailHandler.emailEvent("Problem retrieving FckResource by File_Status[Processed] environment: "+
-					configuration.getEnvironment()+" Error " +e.getMessage());
+			EmailHandler.emailEvent("Problem retrieving FckResource by File_Status[Processed] Error " +e.getMessage(),
+					"Re["+configuration.getEnvironment()+"]: Problem reading FckResource");
 		}
 		return modelList;
 	}

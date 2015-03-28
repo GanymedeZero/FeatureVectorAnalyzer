@@ -1,6 +1,7 @@
 package com.rankminer.featurevectoranalyzer.commands;
 
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher.TaskType;
+import com.rankminer.featurevectoranalyzer.commands.rpm.DailyGenTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.CopyFileTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.ExportMetaDataTask;
 import com.rankminer.featurevectoranalyzer.commands.rpm.ExtractFeatureVectorTask;
@@ -25,6 +26,9 @@ public class RpmTaskFactory implements TaskFactory {
 			
 			case COPYFILE:
 				return new CopyFileTask();
+				
+			case DAILYGEN:
+				return new DailyGenTask();
 			default:
 				break;
 		}
