@@ -53,6 +53,8 @@
 			<dgConfig>
 				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/</sourceFolder>
 				<fileName>rankedlist.csv</fileName>
+				<!-- action=append or add. Append will not delete existing daily_list. Add will wipe out daily list
+				and add new data from rankedlist.csv -->
 				<action>add</action>
 			</dgConfig>
 		</configuration>
@@ -75,8 +77,10 @@
 				<dbName>rankminer</dbName>
 			</dbConfiguration>
 			<dgConfig>
-				<sourceFolder>/Users/tanyajadhav/amit/Projects/RankMiner/</sourceFolder>
+				<sourceFolder>/Users/amit/Projects/RankMiner/</sourceFolder>
 				<fileName>rankedlist.csv</fileName>
+				<!-- action=append or add. Append will not delete existing daily_list. Add will wipe out daily list
+				and add new data from rankedlist.csv -->
 				<action>add</action>
 			</dgConfig>
 		</configuration>
