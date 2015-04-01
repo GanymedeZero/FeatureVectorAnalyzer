@@ -173,18 +173,24 @@ public final class ApplicationLauncher {
             		showUsage(out);
             	} else if(command.contains("export-metadata")) {
             		executeCommand(command,TaskType.EXPORTMETADATA);
+            		break;
             	} else if(command.contains("scp-copy")) {
             		executeCommand(command, TaskType.SCPCOPY);
+            		break;
             	} else if(command.contains("extract")) {
             		executeCommand(command, TaskType.EXTRACTFV);
+            		break;
             	} else if(command.contains("translate")) {
             		executeCommand(command, TaskType.TRANSLATEXMLTOCSV);
+            		break;
             	} else if(command.contains("show-env")) {
             		showEnvironment();
             	} else if(command.contains("copy")) {
             		executeCommand(command, TaskType.COPYFILE);
+            		break;
             	} else if(command.contains("daily-gen")) {
             		executeCommand(command, TaskType.DAILYGEN);
+            		break;
             	}
             }
 		} catch (Exception e) {
