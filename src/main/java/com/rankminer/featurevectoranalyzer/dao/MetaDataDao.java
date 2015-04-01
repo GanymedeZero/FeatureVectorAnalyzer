@@ -1,18 +1,13 @@
 package com.rankminer.featurevectoranalyzer.dao;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-
 import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
 import com.rankminer.featurevectoranalyzer.configuration.Configuration;
 import com.rankminer.featurevectoranalyzer.configuration.MetaDataConfig;
@@ -63,8 +58,9 @@ public class MetaDataDao {
 	        	modelList.add(model);
 	        }
 		}  catch (Exception e) {
-			ApplicationLauncher.logger.severe("Problem reading MetaData record by rec_status. Exception " + e.getMessage());
-			EmailHandler.emailEvent("Problem reading MetaData record by rec_status. Exception " + e.getMessage());
+			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Problem reading MetaData record by rec_status. Exception " + e.getMessage());
+			EmailHandler.emailEvent("Problem reading MetaData record by rec_status. Exception " + e.getMessage(),
+					"Re["+configuration.getEnvironment()+"]: Problem occured during read metadata table");
 		};
 		return modelList;
 	}
@@ -127,10 +123,11 @@ public class MetaDataDao {
 	        conn.commit();
 	        statement.close();
             conn.close();
-	        ApplicationLauncher.logger.info(" "+ updateCount + " rows updated in metadata table for environment: "+ configuration.getEnvironment());
+	        ApplicationLauncher.logger.info("Environment["+configuration.getEnvironment()+"] "+ updateCount + " rows updated in metadata table for environment: "+ configuration.getEnvironment());
 		}catch(Exception e) {
-			EmailHandler.emailEvent("Problem updating scp code status. Error - \t " + e.getMessage());
-			ApplicationLauncher.logger.severe("Problem updating scp code status. Error - \t  " + e.getMessage());
+			EmailHandler.emailEvent("Problem updating scp code status. Error - " + e.getMessage(),
+					"Re["+configuration.getEnvironment()+"]: Problem updating metadata table");
+			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Problem updating scp code status. Error -  " + e.getMessage());
 		}
 	}
 	
@@ -184,16 +181,17 @@ public class MetaDataDao {
 		        	count++;
 		        	totalCount ++;
 	        	}catch(Exception e) {
-	        		ApplicationLauncher.logger.severe("Dropping record no."+ count +" due to "+ e.getMessage());		
+	        		ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Dropping record no."+ count +" due to "+ e.getMessage());		
 	        	}	        		
 	        }
 	        commitRecords(preparedStatement, conn);
             preparedStatement.close();
             conn.close();
-            ApplicationLauncher.logger.info("Database[rpm] - Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
+            ApplicationLauncher.logger.info("Environment["+configuration.getEnvironment()+"] - Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
 		} catch (Exception e) {	
-			ApplicationLauncher.logger.severe("Problem writing record "+  count +"to the database[rpm] "+ e.getMessage());
-			EmailHandler.emailEvent("Problem writing record to the database[rpm]. Error -- "+ e.getMessage());
+			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Problem writing record "+  count +"to the database"+ e.getMessage());
+			EmailHandler.emailEvent("Problem writing record to the database. Error -- "+ e.getMessage(),
+					"Re:["+configuration.getEnvironment()+"] Problem writing to metadata table");
 		}
 	}
 	
@@ -256,8 +254,9 @@ public class MetaDataDao {
 	        			commitRecords(preparedStatement, conn);
 	        		}
 	        	}catch(Exception e) {
-	        		ApplicationLauncher.logger.severe("Dropping record no."+ count +" due to "+ e.getMessage());
-	        		EmailHandler.emailEvent("Problem writing to the db on environment: " + configuration.getEnvironment() + " Error: " + e.getMessage());
+	        		ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Dropping record no."+ count +" due to "+ e.getMessage());
+	        		EmailHandler.emailEvent("Problem writing to metadata Error: " + e.getMessage(),
+	        				"Re["+configuration.getEnvironment()+"]: Problem writing to metadata table");
 	        	}	        		
 	        }
 	        commitRecords(preparedStatement, conn);
@@ -266,7 +265,8 @@ public class MetaDataDao {
             ApplicationLauncher.logger.info("Database[dci] - Time taken to batch update " +totalCount + " records " + (System.currentTimeMillis() - startTime));
 		} catch (Exception e) {	
 			ApplicationLauncher.logger.severe("Problem writing record "+  count +"to the database[dco] "+ e.getMessage());
-			EmailHandler.emailEvent("Problem writing record to the database[dci]. Error -- "+ e.getMessage());
+			EmailHandler.emailEvent("Problem writing record to the database[dci]. Error -- "+ e.getMessage(),
+					"Re["+configuration.getEnvironment()+"]: Problem writing to metada table");
 		}
 	}
 	
@@ -275,7 +275,7 @@ public class MetaDataDao {
 		connection.commit();
 		connection.setAutoCommit(false);
 		statement.clearBatch();
-		ApplicationLauncher.logger.info("Committed " + updateCounts.length + " objects for environment: " + configuration.getEnvironment());
+		ApplicationLauncher.logger.info("Committed " + updateCounts.length + " items for metadata table for environment: " + configuration.getEnvironment());
 	}
 	
 	public static String convertToDate(String date) {
@@ -310,16 +310,18 @@ public class MetaDataDao {
 		       		statement.executeUpdate();	
 			        statement.close();	
 	       		}catch(Exception e) {
-	       			ApplicationLauncher.logger.severe("Problem writing feature vector for file " + entry.getKey());
-	       			EmailHandler.emailEvent("Problem writing feature vector for file :" + entry.getKey() + " Error - " + e.getMessage());
-	       			System.out.println("Problem writing feature vector for file :" + entry.getKey());
+	       			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Problem writing feature vector for file " + entry.getKey());
+	       			EmailHandler.emailEvent("Problem writing feature vector for file :" + entry.getKey() + " Error - " + e.getMessage(),
+	       					"Re["+configuration.getEnvironment()+"]: Problem writing feature vector to metadata");
+	       			
 	       		}
 	        }
 	        conn.commit();	        
 	        conn.close();
 		}catch(Exception e) {
-			ApplicationLauncher.logger.severe("Problem with updating metadata table. Error -- " + e.getMessage());
-   			EmailHandler.emailEvent("Problem with updating metadata table. Error -- " + e.getMessage());
+			ApplicationLauncher.logger.severe("Environment["+configuration.getEnvironment()+"] Problem with updating metadata table. Error -- " + e.getMessage());
+   			EmailHandler.emailEvent("Problem with updating metadata table. Error -- " + e.getMessage(),
+   					"Re[" + configuration.getEnvironment() +"]: Problem writing to metadata table");
 		}
 	}
 	
@@ -341,7 +343,8 @@ public class MetaDataDao {
 	        }
 		}  catch (Exception e) {
 			ApplicationLauncher.logger.severe("Environment: " +configuration.getEnvironment() + " Problem reading MetaData record by status. Exception " + e.getMessage());
-			EmailHandler.emailEvent("Environment: " +configuration.getEnvironment() + " Problem reading MetaData record by status. Exception " + e.getMessage());
+			EmailHandler.emailEvent("Problem reading MetaData record by status. Exception " + e.getMessage(),
+					"Re["+ configuration.getEnvironment() + "]: Problem reading metadata table");
 		}finally{
 			try {
 				conn.close();

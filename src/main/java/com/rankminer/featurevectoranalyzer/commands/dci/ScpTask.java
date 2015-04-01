@@ -100,22 +100,27 @@ public class ScpTask implements TaskInterface {
 				} catch (Exception e) {
 					ApplicationLauncher.logger.severe("Problem occured during scp of file "
 							+ filePath.getValue());
-					EmailHandler.emailEvent("Environment [ "+configuration.getEnvironment() +" Problem occured during scp of file "
-							+ filePath.getValue() + " Error - " + e.getMessage());
-					
 					errorEntries.put(filePath.getKey(), filePath.getValue());
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("Problem during SCP of file");
+			ApplicationLauncher.logger.severe("Environment: "+configuration.getEnvironment()+"Problem during SCP of file. Error -" +e.getMessage());
+			EmailHandler.emailEvent("Problem occured during SCP of file", "Re["+ configuration.getEnvironment() + "]: Problem occured during scp task.");
 		} finally {
-			System.out.println("Copied " + fileCounter + " files");
+			ApplicationLauncher.logger.info("Environment ["+ configuration.getEnvironment()+ "]scp Copied " + fileCounter + " files.");
 			client.disconnect();
+			
 		}
 
+		StringBuilder sb = new StringBuilder();
+		for(String error : errorEntries.values()) {
+			sb.append(error + " \n");
+		}
+		EmailHandler.emailEvent(sb.toString(), "Re["+configuration.getEnvironment() +"]: Problem occured in SCP copy");
 		updateMetaDataStatus(successEntries, errorEntries, configuration);
 	}
 
+	
 	/**
 	 * Update the metadata table entries for files which were successfully
 	 * downloaded or failed to be downloaded.

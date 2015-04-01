@@ -28,23 +28,22 @@ public class CopyFileTask implements TaskInterface {
 			} catch (IOException e) {
 				ApplicationLauncher.logger.severe("Environment: " + configuration.getEnvironment()
 						+ " failure to copy file " + sourceFile.getName() + ". Error - " + e.getMessage());
-				errorCode.add("Environment: " + configuration.getEnvironment()
-						+ " failure to copy file " + sourceFile.getName() + ". Error - " + e.getMessage());
+				errorCode.add("Failure to copy file " + sourceFile.getName() + ". Error - " + e.getMessage());
 			}	
 		}
-		sendErrorEmails(errorCode);
+		sendErrorEmails(errorCode, "Re: CopyFile task failure for environment "+ configuration.getEnvironment());
 	}
 	
 	/**
 	 * Send email about any failure that occured.
 	 * @param errorCodes
 	 */
-	private void sendErrorEmails(List<String> errorCodes) {
+	private void sendErrorEmails(List<String> errorCodes, String subject) {
 		StringBuilder sb = new StringBuilder();
 		for(String error : errorCodes) {
 			sb.append(error + " \n");
 		}
 		
-		EmailHandler.emailEvent(sb.toString());
+		EmailHandler.emailEvent(sb.toString(), subject);
 	}
 }

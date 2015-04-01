@@ -42,7 +42,8 @@ import javax.xml.bind.annotation.XmlType;
     "scpConfig",
     "dbConfiguration",
     "metadataConfig",
-    "copyConfig"
+    "copyConfig",
+    "dgConfig"
 })
 public class Configuration {
 	@XmlElement(required=true)
@@ -57,8 +58,18 @@ public class Configuration {
     protected MetaDataConfig metadataConfig;
     @XmlElement(required=false)
     protected CopyConfig copyConfig;
+    @XmlElement(required=false)
+    protected DailyGenConfig dgConfig;
     
-    public CopyConfig getCopyConfig() {
+    public DailyGenConfig getDgConfig() {
+		return dgConfig;
+	}
+
+	public void setDgConfig(DailyGenConfig dgConfig) {
+		this.dgConfig = dgConfig;
+	}
+
+	public CopyConfig getCopyConfig() {
 		return copyConfig;
 	}
 

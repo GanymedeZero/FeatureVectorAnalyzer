@@ -13,7 +13,7 @@ import com.rankminer.featurevectoranalyzer.ApplicationLauncher;
  */
 public class EmailHandler {
 	
-	public static void emailEvent(String event) {
+	public static void emailEvent(String event, String subject) {
 		try {
 			Email email = new SimpleEmail();
 			email.setHostName(ApplicationLauncher.configurations.getEmailConfiguration().getHostName());
@@ -22,7 +22,7 @@ public class EmailHandler {
 					ApplicationLauncher.configurations.getEmailConfiguration().getPassword()));
 			email.setSSLOnConnect(true);
 			email.setFrom(ApplicationLauncher.configurations.getEmailConfiguration().getSenderEmail());
-			email.setSubject("Error occured");
+			email.setSubject(subject);
 			email.setMsg(event);
 			email.addTo(findReceiverEmails(ApplicationLauncher.configurations.getEmailConfiguration().getReceiverEmail()));
 			email.send();
